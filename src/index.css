@@ -1,0 +1,13 @@
+body {
+  color: #424242;
+  font-family: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background-color: #000019;
+  font-size: 1em;
+
+  margin: auto;
+  width: 50%;
+  max-width: 500px;
+  /* padding: 10px; */
+  /* border: 1px solid green; */
+
+}

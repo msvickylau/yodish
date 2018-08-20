@@ -1,31 +1,35 @@
 import React, { Component } from 'react';
+import {
+  StyledForm,
+  StyledInput,
+  GoButton
+} from './styled'
 
 class InputForm extends Component {
-  componentDidMount() {
-    if (this.input) {
-      this.input.focus();
-    }
-  }
 
   render() {
     const {
       value,
       onChange,
-      onSubmit
+      onSubmit,
+      children
     } = this.props;
 
+    let input;
+
     return(
-      <form onSubmit={onSubmit}>
-        <input
-          type='text'
+      <StyledForm onSubmit={onSubmit}>
+        <StyledInput
+          type="text"
           value={value}
           onChange={onChange}
-          ref={(node) => { this.input = node; }}
+          ref={(node) => input = node}
         />
-        <button type='submit'>
-          submit
-        </button>
-      </form>
+
+        <GoButton type='submit'>
+          {children}
+        </GoButton>
+      </StyledForm>
     )
   }
 }

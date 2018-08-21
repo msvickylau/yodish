@@ -3,6 +3,7 @@ import InputForm from './InputForm';
 import yodaReady from './yoda/yodaReady.svg'
 import yodaAnswer from './yoda/yodaAnswer.svg'
 import yodaBlink from './yoda/yodaBlink.svg'
+import yodaThinking from './yoda/yodaThinking.svg'
 import {
   CommentDiv,
   CommentBubble,
@@ -19,8 +20,10 @@ class App extends Component {
       userInput: '',
       savedUserInput: '',
       yodish: '',
-      currentYoda: 0,
-      history: []
+      yodaBlinking: 0,
+      history: [],
+      isLoading: false,
+      note: ["Stay and help you I will... Mmm...", "(note: yoda takes a while to load.)"]
     }
   }
 
@@ -36,9 +39,12 @@ class App extends Component {
     ? this.setState({yodish: "Submit a sentence, or I will help you not."})
     : this.getYodish(userInput);
       this.setState({savedUserInput: userInput});
-      this.setState({userInput: ''});
+      this.setState({
+        userInput: '',
+        isLoading: true,
+      });
   }
-  
+
   getYodish = (userInput) => {
     const urlencodedInput = encodeURIComponent(userInput.trim());
     const url = 'https://cors-anywhere.herokuapp.com/https://yoda-api.appspot.com/api/v1/yodish?text=' + urlencodedInput
@@ -50,7 +56,10 @@ class App extends Component {
   }
 
   setYodish = (result) => {
-    this.setState({yodish: result.yodish})
+    this.setState({
+      yodish: result.yodish,
+      isLoading: false,
+    })
     let oldInput = this.state.savedUserInput
     let oldYodish = this.state.yodish
     this.setState({history: [oldInput, oldYodish, ...this.state.history]})
@@ -60,6 +69,10 @@ class App extends Component {
     this.setState({yodish: ''})
   }
 
+  clearNote = () => {
+    this.setState({note: []})
+  }
+
   componentDidMount() {
     setInterval(
       () => this.startYodaBlinking(), 2000
@@ -67,29 +80,39 @@ class App extends Component {
   }
 
   startYodaBlinking() {
-    (this.state.currentYoda === 0) ? this.setState({currentYoda: 1}) : this.setState({currentYoda: 0});
+    (this.state.yodaBlinking === 0) ? this.setState({yodaBlinking: 1}) : this.setState({yodaBlinking: 0});
   }
 
   render() {
-    const { currentYoda, userInput, yodish, history } = this.state
-    const yoda = [ yodaReady, yodaBlink ];
+    const { yodaBlinking, isLoading, userInput, yodish, note, history } = this.state
+    const yodaBlinks = [ yodaReady, yodaBlink ];
 
     return (
       <div className="App">
 
         <CommentDiv>
-          { yodish.length > 0
+          { note.length > 0
             ? <CommentBubble>
-              <h4>{yodish}</h4>
-              <XButton onClick={this.clearYodish}>&#10006;</XButton>
+              <h4>{note[0]}</h4>
+              <h5>{note[1]}</h5>
+              <XButton onClick={this.clearNote}>&#10006;</XButton>
             </CommentBubble>
-            : <div>{/* empty if there is no yodish */}</div>
+            : ( yodish.length > 0
+              ? <CommentBubble>
+                <h4>{yodish}</h4>
+                <XButton onClick={this.clearYodish}>&#10006;</XButton>
+              </CommentBubble>
+              : <div>{/* empty if there is no yodish */}</div>
+            )
           }
         </CommentDiv>
 
         { yodish.length > 0
           ? <img alt='yodaAnswer' src={yodaAnswer}/>
-          : <img alt='yoda' src={yoda[currentYoda]}/>
+          : (isLoading
+            ? <img alt='yodaThinking' src={yodaThinking} />
+            : <img alt='yodaBlinking' src={yodaBlinks[yodaBlinking]}/>
+          )
         }
 
         <h4>Yodish translator:</h4>

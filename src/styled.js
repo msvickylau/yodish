@@ -24,6 +24,7 @@ export const XButton = styled.button`
   font-size: 1rem;
   line-height: 1rem;
   border: none;
+  outline: none;
   background-color: transparent;
   position: absolute;
   bottom: 3px;
@@ -64,4 +65,24 @@ export const GoButton = styled.button`
     background-color: #AFB42B;
     color: #FFF;
   }
+`
+export const InputDiv = styled.div`
+  ${'' /* color: #cac888; */}
+  line-height: .85rem;
+  font-size: .8rem;
+  padding: .8em;
+  background-color: #19192f;
+  border-top-left-radius: .2em;
+  border-top-right-radius: 1.5em;
+`
+export const YodishDiv = styled.div`
+  color: #A8A439;
+  background-color: #323246;
+  line-height: .85rem;
+  font-size: .8rem;
+  padding: .8em;
+  border-bottom-left-radius: 1.5em;
+  border-bottom-right-radius: 1.5em;
+  margin-bottom: 15px;
+  text-shadow: 4px 4px 2px rgba(0,0,25, 0.8);
 `

@@ -6,7 +6,9 @@ import yodaBlink from './yoda/yodaBlink.svg'
 import {
   CommentDiv,
   CommentBubble,
-  XButton
+  XButton,
+  InputDiv,
+  YodishDiv,
 } from './styled';
 
 class App extends Component {
@@ -15,6 +17,7 @@ class App extends Component {
 
     this.state = {
       userInput: '',
+      savedUserInput: '',
       yodish: '',
       currentYoda: 0,
       history: []
@@ -28,20 +31,19 @@ class App extends Component {
   onInputSubmit = (event) => {
     event.preventDefault();
     const { userInput } = this.state;
-    if (!userInput.length) {
-      // alert("please submit a sentence")
-      this.setState({yodish: "A sentence, to submit?"});
-    } else {
-      const urlencodedInput = encodeURIComponent(userInput.trim());
-      this.getYodish(urlencodedInput);
+
+    (!userInput.length)
+    ? this.setState({yodish: "Submit a sentence, or I will help you not."})
+    : this.getYodish(userInput);
+      this.setState({savedUserInput: userInput});
       this.setState({userInput: ''});
-    }
   }
 
-  getYodish = (urlencodedString) => {
-    const url = 'http://yoda-api.appspot.com/api/v1/yodish?text=' + urlencodedString
+  getYodish = (userInput) => {
+    const urlencodedInput = encodeURIComponent(userInput.trim());
+    const url = 'http://yoda-api.appspot.com/api/v1/yodish?text=' + urlencodedInput
 
-    fetch(url, {mode: 'cors'})
+    fetch(url)
     .then(response => response.json())
     .then(result => this.setYodish(result))
     .catch(error => console.error('Error: ', error))
@@ -49,6 +51,9 @@ class App extends Component {
 
   setYodish = (result) => {
     this.setState({yodish: result.yodish})
+    let oldInput = this.state.savedUserInput
+    let oldYodish = this.state.yodish
+    this.setState({history: [oldInput, oldYodish, ...this.state.history]})
   }
 
   clearYodish = () => {
@@ -62,53 +67,52 @@ class App extends Component {
   }
 
   startYodaBlinking() {
-    if (this.state.currentYoda === 0) {
-      this.setState({currentYoda: 1})
-    } else {
-      this.setState({currentYoda: 0})
-    }
+    (this.state.currentYoda === 0) ? this.setState({currentYoda: 1}) : this.setState({currentYoda: 0});
   }
 
   render() {
-    const { userInput } = this.state
+    const { currentYoda, userInput, yodish, history } = this.state
     const yoda = [ yodaReady, yodaBlink ];
 
     return (
       <div className="App">
 
         <CommentDiv>
-          { this.state.yodish.length > 0
-            ?
-              <CommentBubble>
-                <h4>{this.state.yodish}</h4>
-                <XButton onClick={this.clearYodish}>&#10006;</XButton>
-              </CommentBubble>
-            :
-            <div>
-              {/* empty if there is no yodish */}
-            </div>
+          { yodish.length > 0
+            ? <CommentBubble>
+              <h4>{yodish}</h4>
+              <XButton onClick={this.clearYodish}>&#10006;</XButton>
+            </CommentBubble>
+            : <div>{/* empty if there is no yodish */}</div>
           }
         </CommentDiv>
 
-        { this.state.yodish.length > 0
-          ?<div>
-            <img alt='yodaAnswer' src={yodaAnswer}/>
-          </div>
-          : <div>
-            <img alt='yoda' src={yoda[this.state.currentYoda]}/>
-          </div>
+        { yodish.length > 0
+          ? <img alt='yodaAnswer' src={yodaAnswer}/>
+          : <img alt='yoda' src={yoda[currentYoda]}/>
         }
 
-        <div>
-          <h4>Yodish translator:</h4>
-          <InputForm
-            value={userInput}
-            onChange={this.onInputChange}
-            onSubmit={this.onInputSubmit}
-          >
-            GO
-          </InputForm>
-        </div>
+        <h4>Yodish translator:</h4>
+        <InputForm
+          value={userInput}
+          onChange={this.onInputChange}
+          onSubmit={this.onInputSubmit}
+        >
+          GO
+        </InputForm>
+
+        { history.length > 0
+          ? <div>
+            <h4>History:</h4>
+
+            { history.map((string, index) => { return index % 2 === 0
+              ? <InputDiv key={index}>{string}</InputDiv>
+              : <YodishDiv key={index}>{string}</YodishDiv>
+            })}
+
+          </div>
+          : <div>{/* empty if there is no history */}</div>
+        }
 
       </div>
     );

@@ -38,10 +38,11 @@ class App extends Component {
     (!userInput.length)
     ? this.setState({yodish: "Submit a sentence, or I will help you not."})
     : this.getYodish(userInput);
-      this.setState({savedUserInput: userInput});
       this.setState({
+        savedUserInput: userInput,
         userInput: '',
         isLoading: true,
+        note: []
       });
   }
 

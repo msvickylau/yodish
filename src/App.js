@@ -38,10 +38,10 @@ class App extends Component {
       this.setState({savedUserInput: userInput});
       this.setState({userInput: ''});
   }
-
+  
   getYodish = (userInput) => {
     const urlencodedInput = encodeURIComponent(userInput.trim());
-    const url = 'https://yoda-api.appspot.com/api/v1/yodish?text=' + urlencodedInput
+    const url = 'https://cors-anywhere.herokuapp.com/https://yoda-api.appspot.com/api/v1/yodish?text=' + urlencodedInput
 
     fetch(url)
     .then(response => response.json())

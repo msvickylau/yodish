@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import InputForm from './InputForm';
-import yodaReady from './yoda/yodaReady.svg'
-import yodaAnswer from './yoda/yodaAnswer.svg'
-import yodaBlink from './yoda/yodaBlink.svg'
-import yodaThinking from './yoda/yodaThinking.svg'
+import Yoda from './Yoda'
+
 import {
   CommentDiv,
   CommentBubble,
@@ -20,7 +18,6 @@ class App extends Component {
       userInput: '',
       savedUserInput: '',
       yodish: '',
-      yodaBlinking: 0,
       history: [],
       isLoading: false,
       note: ["Stay and help you I will... Mmm...", "(note: yoda takes a while to load.)"]
@@ -35,15 +32,17 @@ class App extends Component {
     event.preventDefault();
     const { userInput } = this.state;
 
-    (!userInput.length)
-    ? this.setState({yodish: "Submit a sentence, or I will help you not."})
-    : this.getYodish(userInput);
+    (!userInput.length) ?
+      this.setState({yodish: "Submit a sentence, or I will help you not."})
+     :
+      this.getYodish(userInput)
       this.setState({
         savedUserInput: userInput,
         userInput: '',
         isLoading: true,
         note: []
       });
+
   }
 
   getYodish = (userInput) => {
@@ -57,13 +56,13 @@ class App extends Component {
   }
 
   setYodish = (result) => {
+    let oldInput = this.state.savedUserInput
+    let oldYodish = result.yodish
     this.setState({
       yodish: result.yodish,
       isLoading: false,
+      history: [oldInput, oldYodish, ...this.state.history]
     })
-    let oldInput = this.state.savedUserInput
-    let oldYodish = this.state.yodish
-    this.setState({history: [oldInput, oldYodish, ...this.state.history]})
   }
 
   clearYodish = () => {
@@ -74,47 +73,34 @@ class App extends Component {
     this.setState({note: []})
   }
 
-  componentDidMount() {
-    setInterval(
-      () => this.startYodaBlinking(), 2000
-    );
-  }
-
-  startYodaBlinking() {
-    (this.state.yodaBlinking === 0) ? this.setState({yodaBlinking: 1}) : this.setState({yodaBlinking: 0});
-  }
-
   render() {
-    const { yodaBlinking, isLoading, userInput, yodish, note, history } = this.state
-    const yodaBlinks = [ yodaReady, yodaBlink ];
+    const {isLoading, userInput, yodish, note, history } = this.state
 
     return (
       <div className="App">
 
         <CommentDiv>
-          { note.length > 0
-            ? <CommentBubble>
+          { note.length > 0 ? (
+            <CommentBubble>
               <h4>{note[0]}</h4>
               <h5>{note[1]}</h5>
               <XButton onClick={this.clearNote}>&#10006;</XButton>
             </CommentBubble>
-            : ( yodish.length > 0
+          ) : (
+            ( yodish.length > 0
               ? <CommentBubble>
                 <h4>{yodish}</h4>
                 <XButton onClick={this.clearYodish}>&#10006;</XButton>
               </CommentBubble>
               : <div>{/* empty if there is no yodish */}</div>
             )
-          }
+          )}
         </CommentDiv>
 
-        { yodish.length > 0
-          ? <img alt='yodaAnswer' src={yodaAnswer}/>
-          : (isLoading
-            ? <img alt='yodaThinking' src={yodaThinking} />
-            : <img alt='yodaBlinking' src={yodaBlinks[yodaBlinking]}/>
-          )
-        }
+        <Yoda
+          yodish={yodish}
+          isLoading={isLoading}
+        />
 
         <h4>Yodish translator:</h4>
         <InputForm
@@ -125,18 +111,14 @@ class App extends Component {
           GO
         </InputForm>
 
-        { history.length > 0
-          ? <div>
+        { history.length > 0 ? (
+          <div>
             <h4>History:</h4>
-
-            { history.map((string, index) => { return index % 2 === 0
-              ? <InputDiv key={index}>{string}</InputDiv>
-              : <YodishDiv key={index}>{string}</YodishDiv>
-            })}
-
+            { history.map((string, index) => { return index % 2 === 0 ? <InputDiv key={index}>{string}</InputDiv> : <YodishDiv key={index}>{string}</YodishDiv>})}
           </div>
-          : <div>{/* empty if there is no history */}</div>
-        }
+        ):(
+          <div>{/* empty if there is no history */}</div>
+        )}
 
       </div>
     );
